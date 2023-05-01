@@ -12,23 +12,41 @@ import { useState } from "react";
 import GoalItem from "./components/GoalItem";
 import GoalInput from "./components/GoalInput";
 
+
 export default function App() {
   const [courseGoals, setCourseGoals] = useState([]);
+  const [modalIsVisible, setModalIsVisible] = useState(false);
 
- 
+  
+   function startAddGoal()
+   {
+    setModalIsVisible(true);
+   }
+
 
   function addGoalHandler(enteredGoal) {
     // console.log(enteredGoal);
-    setCourseGoals((current) => [
-      ...current,
-      { text: enteredGoal, key: Math.random().toString() },
-    ]);
+    if (enteredGoal.trim().length !== 0) {
+      setCourseGoals((current) => [
+        ...current,
+        { text: enteredGoal, key: Math.random().toString() },
+      ]);
+    } else {
+      console.log("No Goal Entered");
+    }
+  }
+
+  function deleteGoalHandler(id) {
+    setCourseGoals((current) => {
+      return current.filter((goals) => goals.id !== id);
+    });
   }
 
   return (
     <View style={styles.appContainer}>
       <Text style={styles.headerText}>Rafay's Goal Tracking App</Text>
-      <GoalInput onAddGoal = {addGoalHandler} />
+      <Button title="Add Goal" color={"#5e0acc"} onPress={startAddGoal}/>
+     <GoalInput onAddGoal={addGoalHandler} visible={modalIsVisible}/>
 
       <View style={styles.goalsContainer}>
         <FlatList
@@ -36,7 +54,11 @@ export default function App() {
           renderItem={(itemData) => {
             return (
               <>
-               <GoalItem itemData={itemData}/>
+                <GoalItem
+                  text={itemData.item.text}
+                  id={itemData.item.index}
+                  onDelete={deleteGoalHandler}
+                />
               </>
             );
           }}
@@ -63,9 +85,7 @@ const styles = StyleSheet.create({
     color: "#5e0acc",
   },
 
-  
   goalsContainer: {
     flex: 1,
   },
- 
 });
